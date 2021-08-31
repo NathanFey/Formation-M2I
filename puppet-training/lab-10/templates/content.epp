@@ -1,0 +1,2 @@
+Welcome to <%= $app %>-<%= $version %>.pp By Nathan on <%= $fqdn %>
+<%= $facts['os']['family'] %>
