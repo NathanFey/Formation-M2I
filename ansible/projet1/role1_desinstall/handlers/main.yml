@@ -1,0 +1,8 @@
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+- name: start mariadb
+  service:
+    name: mariadb
+    state: started

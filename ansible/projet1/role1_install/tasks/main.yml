@@ -1,0 +1,37 @@
+- name: Installer des paquets  
+  block:
+    - package:
+        name: "{{ package }}"
+        state: latest
+      tags: paquets
+    - command: find /usr/share/nginx -iname "*.html"
+      register: find_output
+    - copy:
+        src: "{{ item }}"
+        dest: "{{ item }}.orig"
+        remote_src: yes
+      with_items:
+        - "{{ find_output.stdout_lines }}"
+    - template:
+        src: index.html.j2
+        dest: /var/www/html/index.html
+      tags: template_jinja2
+      notify: reload nginx
+
+ 
+
+
+  when: ansible_distribution=='Ubuntu'
+
+ 
+
+- name: installer mariadb sur les serveurs de base de données
+  block:
+    - package:
+        name: mariadb-server
+        state: latest
+      notify: start mariadb
+
+ 
+
+  when: ansible_distribution=='CentOS'

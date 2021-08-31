@@ -1,0 +1,19 @@
+- name: Installer nginx sur les serveurs web
+  hosts: web
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Installer nginx
+      package:
+        name: nginx
+        state: latest
+
+- name: Installer mariadb sur les servuers de base de données
+  hosts: db
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Installer mariadb-server
+      package:
+        name: mariadb-server
+        state: latest

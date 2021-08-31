@@ -1,0 +1,8 @@
+liste:
+  - Formation Ansible
+  - Nathan FEYDEL
+  - nathan_feydel972@hotmail.fr
+  - stagiaire
+package: ['nginx','mariadb-client','php-mbstring','php-fpm','php-xml','php-intl','php-mysql']
+#il faut normalement installer aussi mariadb-client
+

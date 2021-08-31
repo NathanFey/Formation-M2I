@@ -1,0 +1,60 @@
+- name: Installer nginx sur les serveurs web
+  hosts: web
+  gather_facts: false
+  become: yes
+  vars:
+    liste:
+      - Formation Ansible
+      - Nathan Feydel
+      - nathan_feydel972@hotmail.fr
+      - stagiaire
+
+  tasks:
+    - name: Installer nginx
+      package:
+        name: nginx
+        state: latest
+    - name: Recherche de fichiers html
+      command: find /usr/share/nginx -iname "*.html"
+      register: find_output
+    - name: sauvegarde les html
+      copy:
+        src: "{{ item }}"
+        dest: "{{ item }}.orig"
+        remote_src: yes
+      with_items:
+        - "{{ find_output.stdout_lines }}"
+    - name: Editer index.html
+      #copy:
+      template:
+        src: index.html.j2
+              #content: "{{ liste }}"
+        dest: /var/www/html/index.html        
+        #      command: echo "{{ item }}" > /usr/share/nginx/html/index.html
+        #loop: 
+        #- "{{ liste }}"
+      notify: reload nginx 
+  
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
+
+- name: Installer mariadb sur les serveurs de base de données
+  hosts: db
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Installer mariadb-server
+      package:
+        name: mariadb-server
+        state: latest
+      notify: start mariadb
+
+  handlers:
+    - name: start mariadb
+      service:
+        name: mariadb
+        state: restarted
+
