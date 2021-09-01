@@ -1,0 +1,124 @@
+- name: configurer password admin
+  debconf:
+    name: slapd
+    question: slapd/password1
+    vtype: password
+    value: '{{ openldap_password }}'
+  tags:
+    - openldap
+    - config
+
+- name: confirmation de password admin
+  debconf:
+    name: slapd
+    question: slapd/password2
+    vtype: password
+    value: '{{ openldap_password }}'
+  tags:
+    - openldap
+    - config
+
+- name: config du nom de l'organisation
+  debconf:
+    name: slapd
+    question: shared/organization
+    vtype: string
+    value: '{{ openldap_organization }}'
+  tags:
+    - openldap
+    - config
+
+- name: config du nom de domaine
+  debconf:
+    name: slapd
+    question: slapd/domain
+    vtype: string
+    value: '{{ openldap_domain }}'
+  tags:
+    - openldap
+    - config
+
+- name: installation d'OpenLDAP et les utilitaires
+  package:
+    name: '{{ openldap_packages }}'
+  tags:
+    - package
+    - openldap
+
+- name: template entrées
+  template:
+    src: atos.ldif.j2
+    dest: /tmp/atos.ldif
+  tags:
+    - openldap
+    - entrée
+
+- name: ajouter des entrées à l'annuaire
+  expect:
+    command: ldapadd -cxWD cn=admin,dc=atos,dc=fr -f /tmp/atos.ldif
+    responses:
+      'Enter LDAP Password:': '{{ openldap_password }}'
+  ignore_errors: true
+  tags:
+    - openldap
+    - entrée
+
+- name: supprimer une entrée
+  ldap_entry:
+    dn: cn=brahim,ou=employes,dc=atos,dc=fr
+    state: absent
+    bind_dn: 'cn=admin,dc=atos,dc=fr'
+    bind_pw: '{{ openldap_password }}'
+  tags:
+    - rm_entrée
+
+- name: Activate ssl
+  tags: ssl
+  block:
+  - name: create ssl dir
+    file:
+      path: '{{ openldap_confdir }}/ssl'
+      state: directory
+      owner : '{{ openldap_user }}'
+      group: '{{ openldap_group }}'
+      mode: '0640'
+      
+  - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
+    community.crypto.openssl_privatekey:
+      path: "{{ openldap_confdir }}/ssl/key.pem"
+  
+  - name: Generate an OpenSSL Certificate Signing Request
+    community.crypto.openssl_csr:
+      path: "{{ openldap_confdir }}/ssl/ldap.csr"
+      privatekey_path: "{{ openldap_confdir }}/ssl/key.pem"
+      common_name: "atos.fr"
+  
+  - name: Generate a Self Signed OpenSSL certificate
+    community.crypto.openssl_certificate:
+      path: "{{ openldap_confdir }}/ssl/ldap.crt"
+      privatekey_path: "{{ openldap_confdir }}/ssl/key.pem"
+      csr_path: "{{ openldap_confdir }}/ssl/ldap.csr"
+      provider: selfsigned
+      
+  - name: change file permission
+    file:
+      path: '{{ openldap_confdir }}/ssl/{{ item }}'
+      owner : '{{ openldap_user }}'
+      group: '{{ openldap_group }}'
+      mode: '0640'
+    loop:
+    - ldap.crt
+    - ldap.csr
+    - key.pem
+    
+  - name: Add ldaps:// into /etc/sysconfig/slapd
+    lineinfile:
+     path: /etc/default/slapd
+     regexp: 'SLAPD_SERVICES='
+     line: 'SLAPD_SERVICES="ldapi:/// ldap:/// ldaps:///"'
+     
+  - name: Modify ldap with certs.ldif 
+    expect: 
+      command: "ldapmodify -Y EXTERNAL  -H ldapi:/// -f certs.ldif "
+      responses:
+        'Enter LDAP Password:' : "{{ openldap_admin_password }}"

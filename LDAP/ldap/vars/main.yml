@@ -1,0 +1,33 @@
+openldap_password: 'atos'
+openldap_organization: 'atos.fr'
+openldap_domain: 'atos.fr'
+openldap_packages:
+  - slapd
+  - ldap-utils
+  - python3-ldap
+
+openldap_confdir: /etc/ldap
+openldap_user: openldap
+openldap_group: openldap
+
+  
+unit:
+  - employes
+  - fournisseurs
+annuaire:
+  - cn: brahim
+    sn: hamdi
+    dsc: formateur
+    tel: 123456789
+    ou: employes
+  - cn: damien
+    sn: viniere
+    dsc: sysadmin
+    tel: 987654321
+    ou: employes
+  - cn: aboubacar
+    sn: diallo
+    dsc: devweb
+    tel: 147896325
+    ou: employes
+

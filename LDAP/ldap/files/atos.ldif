@@ -1,0 +1,33 @@
+dn: ou=employes,dc=atos,dc=fr
+objectClass: organizationalUnit
+ou: employes
+
+dn: ou=fournisseurs,dc=atos,dc=fr
+objectClass: organizationalUnit
+ou: fournisseurs
+
+dn: cn=brahim,ou=employes,dc=atos,dc=fr
+objectClass: person
+cn: brahim
+sn: hamdi
+description: formateur
+telephoneNumber: 123456789
+#Uid: bhamdi
+
+dn: cn=aboubacar,ou=employes,dc=atos,dc=fr
+objectClass: person
+cn: aboubacar
+sn: diallo
+description: dev web
+telephoneNumber: 987654321
+#Uid: adiallo
+
+dn: cn=damien,ou=employes,dc=atos,dc=fr
+objectClass: person
+cn: damien
+sn: viniere
+description: sysadmin
+telephoneNumber: 147896325
+#Uid: dviniere
+
+

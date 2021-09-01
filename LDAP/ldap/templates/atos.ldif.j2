@@ -1,0 +1,30 @@
+dn: dc=atos,dc=fr
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: atos.fr
+dc: atos
+
+dn: cn=admin,dc=atos,dc=fr
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+userPassword:: e1NTSEF9SW1uMk5xZ0hRMnhzVjVGaUVQZ3FzL3lTMGVLNDZHN0Y=
+
+{%for item in unit %}
+dn: ou={{ item }},dc=atos,dc=fr
+objectClass: organizationalUnit
+ou: {{ item }}
+
+{% endfor %}
+
+{%for item in annuaire %}
+dn: cn={{ item.cn }},ou={{ item.ou }},dc=atos,dc=fr
+objectClass: person
+cn: {{ item.cn }}
+sn: {{ item.sn }}
+description: {{ item.dsc }}
+telephoneNumber: {{ item.tel }}
+
+{% endfor %}

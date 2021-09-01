@@ -1,0 +1,6 @@
+- name: deployer annuaire LDAP
+  hosts: host1
+  become: true
+  gather_facts: false
+  roles:
+    - ldap 
